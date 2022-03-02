@@ -6,7 +6,7 @@
 /*   By: raaga <raaga@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/24 13:51:20 by raaga             #+#    #+#             */
-/*   Updated: 2022/02/25 20:06:24 by raaga            ###   ########.fr       */
+/*   Updated: 2022/03/02 20:59:15 by raaga            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 char *find_path(char **envp)
 {
-	while (ft_strncmp("PATH", *envp, 5) != 0)
+	while (ft_strncmp("PATH=", *envp, 5) != 0)
 		envp++;
-	return (*envp + 5);
+	return (*envp);
 }
 
 char	*get_path(char *cmd1, char **split)
@@ -45,9 +45,10 @@ void	ft_son(char **argv, char **envp, t_pipex pipex)
 		ft_printf("%s %s\n", ERR_CMD, pipex.cmd_arg[0]);
 		exit(1);
 	}
+	
 	dup2(pipex.pipefd[1], 1);
-	dup2(pipex.infile, 0);
 	close(pipex.pipefd[0]);
+	dup2(pipex.infile, 0);
 	execve(pipex.cmd, pipex.cmd_arg, envp);
 }
 
@@ -64,9 +65,11 @@ void	ft_son2(char **argv, char **envp, t_pipex pipex)
 		ft_printf("%s %s\n", ERR_CMD, pipex.cmd_arg[0]);
 		exit(1);
 	}
+	
 	dup2(pipex.pipefd[0], 0);
-	dup2(pipex.outfile, 1);
 	close(pipex.pipefd[1]);
+	dup2(pipex.outfile, 1);
+	
 	execve(pipex.cmd, pipex.cmd_arg, envp);
 }
 int	main(int argc, char **argv, char **envp)
@@ -74,6 +77,7 @@ int	main(int argc, char **argv, char **envp)
 	t_pipex pipex;
 	
 	(void)argv;
+	(void)argc;
 	if (argc != 5)
 		return (msg_err(ERR_ARG));
 	pipex.infile = open(argv[1], O_RDONLY);
@@ -84,15 +88,19 @@ int	main(int argc, char **argv, char **envp)
 		return (msg_err(ERR_OUTFILE));
 	pipex.path = ft_split(find_path(envp), ':');
 	pipe(pipex.pipefd);
-	
 	pipex.pid1 = fork();
 	if (pipex.pid1 == 0)
 	{
 		ft_son(argv, envp, pipex);
 	}
-	else
+	pipex.pid2 = fork();
+	if (pipex.pid2 == 0)
 	{	
 		ft_son2(argv, envp, pipex);
 	}
+ 	waitpid(pipex.pid1, NULL, 0);
+	waitpid(pipex.pid2, NULL, 0); 
+	//waitpid(pipex.pid2, NULL, 0);
+
 	return (0);
 }

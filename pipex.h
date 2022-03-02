@@ -6,7 +6,7 @@
 /*   By: raaga <raaga@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/24 13:50:47 by raaga             #+#    #+#             */
-/*   Updated: 2022/02/25 19:59:26 by raaga            ###   ########.fr       */
+/*   Updated: 2022/03/02 19:19:43 by raaga            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define PIPEX_H
 
 # include <unistd.h>
+# include <stdio.h>
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <fcntl.h>
@@ -33,6 +34,7 @@ struct          s_pipex
     int outfile;
     int pipefd[2];
     pid_t pid1;
+    pid_t pid2;
     char **path;
     char **cmd_arg;
     char *cmd;
