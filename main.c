@@ -59,7 +59,8 @@ void	ft_son(char **argv, char **envp, t_pipex pipex)
 	{
 		printf("%s %s\n", pipex.cmd_arg[0], ERR_CMD);
 		ft_free(pipex.cmd_arg);
-		return ;
+		ft_free(pipex.path);
+		exit (2);
 	}
 	dup2(pipex.pipefd[1], 1);
 	close(pipex.pipefd[1]);
@@ -92,7 +93,8 @@ void	ft_son2(char **argv, char **envp, t_pipex pipex)
 
 		ft_printf("%s %s\n", pipex.cmd_arg[0], ERR_CMD);
 		ft_free(pipex.cmd_arg);
-		return ;
+		ft_free(pipex.path);
+		exit (2);
 	}
 	dup2(pipex.pipefd[0], 0);
 	close(pipex.pipefd[1]);
@@ -149,20 +151,17 @@ int	main(int argc, char **argv, char **envp)
 		return (msg_err(ERR_OUTFILE));
 	s = ft_strjoin(find_path(envp), ":");
 	pipex.path = complet_path(ft_split(s, ':'));
+	free(s);
 	pipe(pipex.pipefd);
 	pipex.pid1 = fork();
 	if (pipex.pid1 == 0)
 	{
 		ft_son(argv, envp, pipex);
-		//free(pipex.cmd);
-		//ft_free(pipex.cmd_arg);
 	}
 	pipex.pid2 = fork();
 	if (pipex.pid2 == 0)
 	{	
 		ft_son2(argv, envp, pipex);
-		//free(pipex.cmd);
-		//ft_free(pipex.cmd_arg);
 	}
 	close(pipex.pipefd[1]);
 	close(pipex.pipefd[0]);
@@ -171,6 +170,5 @@ int	main(int argc, char **argv, char **envp)
 	waitpid(pipex.pid1, NULL, 0);
 	waitpid(pipex.pid2, NULL, 0);
 	ft_free(pipex.path);
-	free(s);
 	return (0);
 }
