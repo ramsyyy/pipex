@@ -19,11 +19,12 @@ int ft_strncmp(char *s1, char *s2, int n)
     i = 0;
     if (n == 0)
         return (0);
-    while (s2[i] == s1[i] && s1[i] && s2[i] && i < n)
-    {
-            s1++;
-            s2++;        
+    while (s1[i] && s2[i] && i < n)
+    {   
+            if (s2[i] != s1[i])
+                return (-1);
             i++;
     }
-    return (*s1 - *s2);
+   // printf("QWEQWEQW %c et %c \n", s1[i], s2[i]);
+    return (0);
 }

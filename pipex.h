@@ -6,7 +6,7 @@
 /*   By: raaga <raaga@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/24 13:50:47 by raaga             #+#    #+#             */
-/*   Updated: 2022/03/02 19:19:43 by raaga            ###   ########.fr       */
+/*   Updated: 2022/03/04 14:51:41 by raaga            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,13 @@
 # include <fcntl.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <errno.h>
 # include "./ft_printf/ft_printf.h"
 
 # define ERR_ARG "Invalid number of arguments.\n"
-# define ERR_INFILE "Invalid infile.\n"
+# define ERR_INFILE strerror(errno)
 # define ERR_OUTFILE "Invalid outfile.\n"
-# define ERR_CMD "zsh : command not found:"
+# define ERR_CMD ":command not found"
 
 typedef struct  s_pipex t_pipex;
 struct          s_pipex
