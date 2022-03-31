@@ -37,15 +37,14 @@ char	*get_path(char *cmd1, char **split)
 	while (*split)
 	{
 		cmd = ft_strjoin(*split , tmp);
-		//printf("ASDADS %d\n", access(cmd, F_OK));
 		if (access(cmd, F_OK ) == 0)
 		{
-			
-			//printf("ASDADS %d\n", access(cmd, F_OK));
 			return (cmd);
 		}
+		free(cmd);
 		split++;
 	}
+	
 	return (NULL);	
 }
 
@@ -59,7 +58,8 @@ void	ft_son(char **argv, char **envp, t_pipex pipex)
 	if (pipex.cmd == NULL)
 	{
 		printf("%s %s\n", pipex.cmd_arg[0], ERR_CMD);
-		exit(1);
+		ft_free(pipex.cmd_arg);
+		return ;
 	}
 	dup2(pipex.pipefd[1], 1);
 	close(pipex.pipefd[1]);
@@ -74,6 +74,8 @@ void	ft_son(char **argv, char **envp, t_pipex pipex)
 		 write(2, pipex.cmd, ft_strlen(pipex.cmd));
 		 perror(" ");
 	}
+	free(pipex.cmd);
+	ft_free(pipex.cmd_arg);
 }
 	
 
@@ -87,8 +89,10 @@ void	ft_son2(char **argv, char **envp, t_pipex pipex)
 	if (pipex.cmd == NULL)
 	{
 		//res = execve(pipex.cmd, pipex.cmd_arg, envp);
+
 		ft_printf("%s %s\n", pipex.cmd_arg[0], ERR_CMD);
-		exit(1);
+		ft_free(pipex.cmd_arg);
+		return ;
 	}
 	dup2(pipex.pipefd[0], 0);
 	close(pipex.pipefd[1]);
@@ -103,25 +107,32 @@ void	ft_son2(char **argv, char **envp, t_pipex pipex)
 		 write(2, pipex.cmd, ft_strlen(pipex.cmd));
 		 perror("");
 	}
+	free(pipex.cmd);
+	ft_free(pipex.cmd_arg);
 }
 
 char **complet_path(char **split)
 {
 	int i;
+	char *tmp;
 
 	i = 0;
 	while (split[i])
 	{
-		split[i] = ft_strjoin(split[i], "/");
+		tmp = split[i];
+		split[i] = ft_strjoin(tmp , "/");
+		free(tmp);
 		i++;
 	}
-	split[i] = "";
+	split[i] = ft_strjoin(split[i], "");
 	return (split);
 }
+
 
 int	main(int argc, char **argv, char **envp)
 {
 	t_pipex pipex;
+	char *s;
 	
 	(void)argv;
 	(void)argc;
@@ -136,26 +147,30 @@ int	main(int argc, char **argv, char **envp)
 	pipex.outfile = open(argv[4], O_TRUNC | O_CREAT | O_RDWR, 00644);
 	if (pipex.outfile < 0)
 		return (msg_err(ERR_OUTFILE));
-	pipex.path = ft_split(ft_strjoin(find_path(envp), ":"), ':');
-	//printf("QWEQWE %s\n",find_path(envp));
-	pipex.path = complet_path(pipex.path);
+	s = ft_strjoin(find_path(envp), ":");
+	pipex.path = complet_path(ft_split(s, ':'));
 	pipe(pipex.pipefd);
 	pipex.pid1 = fork();
 	if (pipex.pid1 == 0)
 	{
 		ft_son(argv, envp, pipex);
+		//free(pipex.cmd);
+		//ft_free(pipex.cmd_arg);
 	}
 	pipex.pid2 = fork();
 	if (pipex.pid2 == 0)
 	{	
-		
 		ft_son2(argv, envp, pipex);
+		//free(pipex.cmd);
+		//ft_free(pipex.cmd_arg);
 	}
 	close(pipex.pipefd[1]);
 	close(pipex.pipefd[0]);
 	close(pipex.infile);
 	close(pipex.outfile);
- 	waitpid(pipex.pid1, NULL, 0);
-	waitpid(pipex.pid2, NULL, 0); 
+	waitpid(pipex.pid1, NULL, 0);
+	waitpid(pipex.pid2, NULL, 0);
+	ft_free(pipex.path);
+	free(s);
 	return (0);
 }

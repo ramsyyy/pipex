@@ -12,7 +12,7 @@
 
 #include "../pipex.h"
 
-static char	*ft_free(char **tab)
+char	*ft_free(char **tab)
 {
 	int	i;
 
@@ -68,7 +68,7 @@ static char	*ftt_strdup(char **tab, char const *s, char c)
 	return (dest);
 }
 
-char	**ft_split(char const *s, char c)
+char	**ft_split(char *s, char c)
 {
 	char	**tab;
 	int		i;
@@ -93,6 +93,6 @@ char	**ft_split(char const *s, char c)
 				s++;
 		}
 	}
-	tab[i] = 0;
+	tab[i] = NULL;
 	return (tab);
 }
