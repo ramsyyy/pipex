@@ -13,7 +13,7 @@ OBJ := $(.c=.o)
 
 SRC = ./main.c
 
-UTILS = ./error.c ./function/* ./parsing.c
+UTILS = ./function/* 
 
 all : $(NAME)
 
@@ -23,7 +23,7 @@ all : $(NAME)
 $(NAME): $(OBJ)
 		make -C $(PRINTFPATH)
 		mv $(PRINTFPATH)$(PRINTFNAME) $(PRINTFNAME)
-		${CC}  ${CFLAGS} ${SRC} $(UTILS) $(PRINTFNAME) -o ${NAME}
+		${CC}  ${CFLAGS} $(UTILS) $(PRINTFNAME) -o ${NAME}
 
 clean:
 		rm -rf *.o && make -C $(PRINTFPATH) clean
