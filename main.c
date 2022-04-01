@@ -12,54 +12,37 @@
 
 #include "pipex.h"
 
-char *find_path(char **envp)
-{
-	int i;
-
-	i = 0;
-	while (ft_strncmp("PATH=", envp[i], 5) != 0)
-	{
-		i++;
-	}
-	return (envp[i]);
-}
-
 char	*get_path(char *cmd1, char **split)
 {
 	char	*tmp;
 	char	*cmd;
-	
+
 	tmp = cmd1;
 	if (cmd1[0] == '.' || cmd1[0] == '/')
-	{
-			return (cmd1);
-	}
+		return (cmd1);
 	while (*split)
 	{
-		cmd = ft_strjoin(*split , tmp);
-		if (access(cmd, F_OK ) == 0)
+		cmd = ft_strjoin(*split, tmp);
+		if (access(cmd, F_OK) == 0)
 		{
 			return (cmd);
 		}
 		free(cmd);
 		split++;
 	}
-	
-	return (NULL);	
+	return (NULL);
 }
 
 void	ft_son(char **argv, char **envp, t_pipex pipex)
 {
 	int	res;
-	
+
 	pipex.cmd_arg = ft_split(argv[2], ' ');
-	//printf("QEQWEQW %d\n", access("/usr/bin//ls", F_OK & X_OK) );
 	pipex.cmd = get_path(pipex.cmd_arg[0], pipex.path);
 	if (pipex.cmd == NULL)
 	{
 		printf("%s %s\n", pipex.cmd_arg[0], ERR_CMD);
 		ft_free(pipex.cmd_arg);
-		ft_free(pipex.path);
 		exit (2);
 	}
 	dup2(pipex.pipefd[1], 1);
@@ -71,29 +54,23 @@ void	ft_son(char **argv, char **envp, t_pipex pipex)
 	res = execve(pipex.cmd, pipex.cmd_arg, envp);
 	if (res == -1)
 	{
-	 	write(2, "bash: ", ft_strlen("bash: "));
-		 write(2, pipex.cmd, ft_strlen(pipex.cmd));
-		 perror(" ");
+		write(2, "bash: ", ft_strlen("bash: "));
+		write(2, pipex.cmd, ft_strlen(pipex.cmd));
+		perror(" ");
 	}
-	free(pipex.cmd);
 	ft_free(pipex.cmd_arg);
 }
-	
-
 
 void	ft_son2(char **argv, char **envp, t_pipex pipex)
 {
 	int	res;
-	
+
 	pipex.cmd_arg = ft_split(argv[3], ' ');
 	pipex.cmd = get_path(pipex.cmd_arg[0], pipex.path);
 	if (pipex.cmd == NULL)
 	{
-		//res = execve(pipex.cmd, pipex.cmd_arg, envp);
-
 		ft_printf("%s %s\n", pipex.cmd_arg[0], ERR_CMD);
 		ft_free(pipex.cmd_arg);
-		ft_free(pipex.path);
 		exit (2);
 	}
 	dup2(pipex.pipefd[0], 0);
@@ -105,63 +82,30 @@ void	ft_son2(char **argv, char **envp, t_pipex pipex)
 	res = execve(pipex.cmd, pipex.cmd_arg, envp);
 	if (res == -1)
 	{
-	 	write(2, "bash: ", ft_strlen("bash: "));
-		 write(2, pipex.cmd, ft_strlen(pipex.cmd));
-		 perror("");
+		write(2, "bash: ", ft_strlen("bash: "));
+		write(2, pipex.cmd, ft_strlen(pipex.cmd));
+		perror("");
 	}
-	free(pipex.cmd);
 	ft_free(pipex.cmd_arg);
 }
 
-char **complet_path(char **split)
-{
-	int i;
-	char *tmp;
-
-	i = 0;
-	while (split[i])
-	{
-		tmp = split[i];
-		split[i] = ft_strjoin(tmp , "/");
-		free(tmp);
-		i++;
-	}
-	split[i] = ft_strjoin(split[i], "");
-	return (split);
-}
-
-
 int	main(int argc, char **argv, char **envp)
 {
-	t_pipex pipex;
-	char *s;
-	
-	(void)argv;
-	(void)argc;
-	if (argc != 5)
-		return (msg_err(ERR_ARG));
-	pipex.infile = open(argv[1], O_RDONLY);
-	if (pipex.infile < 0)
-	{
-		ft_printf("bash: %s: %s\n", argv[1], strerror(errno));
+	t_pipex	pipex;
+
+	if (check_arg(argc, argv, envp, &pipex) == 0)
 		return (0);
-	}
-	pipex.outfile = open(argv[4], O_TRUNC | O_CREAT | O_RDWR, 00644);
-	if (pipex.outfile < 0)
-		return (msg_err(ERR_OUTFILE));
-	s = ft_strjoin(find_path(envp), ":");
-	pipex.path = complet_path(ft_split(s, ':'));
-	free(s);
-	pipe(pipex.pipefd);
-	pipex.pid1 = fork();
-	if (pipex.pid1 == 0)
+	if (pipex.infile >= 0)
 	{
-		ft_son(argv, envp, pipex);
+		pipex.pid1 = fork();
+		if (pipex.pid1 == 0)
+			ft_son(argv, envp, pipex);
 	}
-	pipex.pid2 = fork();
-	if (pipex.pid2 == 0)
-	{	
-		ft_son2(argv, envp, pipex);
+	if (pipex.outfile >= 0)
+	{
+		pipex.pid2 = fork();
+		if (pipex.pid2 == 0)
+			ft_son2(argv, envp, pipex);
 	}
 	close(pipex.pipefd[1]);
 	close(pipex.pipefd[0]);

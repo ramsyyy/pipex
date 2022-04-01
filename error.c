@@ -12,8 +12,8 @@
 
 #include "pipex.h"
 
-int msg_err(char *str)
+int	msg_err(char *str)
 {
-    write(1, str, ft_strlen(str));
-    return (0);
+	write(2, str, ft_strlen(str));
+	return (0);
 }

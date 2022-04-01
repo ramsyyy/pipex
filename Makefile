@@ -13,7 +13,7 @@ OBJ := $(.c=.o)
 
 SRC = ./main.c
 
-UTILS = ./error.c ./function/*
+UTILS = ./error.c ./function/* ./parsing.c
 
 all : $(NAME)
 

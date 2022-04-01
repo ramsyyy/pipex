@@ -24,27 +24,28 @@
 # include "./ft_printf/ft_printf.h"
 
 # define ERR_ARG "Invalid number of arguments.\n"
-# define ERR_INFILE strerror(errno)
 # define ERR_OUTFILE "Invalid outfile.\n"
 # define ERR_CMD ":command not found"
 
-typedef struct  s_pipex t_pipex;
-struct          s_pipex
+typedef struct s_pipex	t_pipex;
+struct			s_pipex
 {
-    int infile;
-    int outfile;
-    int pipefd[2];
-    pid_t pid1;
-    pid_t pid2;
-    char **path;
-    char **cmd_arg;
-    char *cmd;
+	int		infile;
+	int		outfile;
+	int		pipefd[2];
+	pid_t	pid1;
+	pid_t	pid2;
+	char	**path;
+	char	**cmd_arg;
+	char	*cmd;
 };
 
-int     msg_err(char *str);
-int     ft_strncmp(char *s1, char *s2, int n);
+int		msg_err(char *str);
+int		ft_strncmp(char *s1, char *s2, int n);
 char	**ft_split(char *s, char c);
 char	*ft_strjoin(char const *s1, char const *s2);
 char	*ft_free(char **split);
+int		check_arg(int argc, char **argv, char **envp, t_pipex *pipex);
+char	**complet_path(char **split);
 
 #endif
