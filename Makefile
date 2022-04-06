@@ -1,34 +1,39 @@
-CC = gcc
+NAME	=	pipex
 
-NAME = pipex
+INCS	=	pipex.h
 
-PRINTFPATH = ./ft_printf/
+SRCS	=	./function/ft_split.c \
+			./function/ft_strjoin.c \
+			./function/ft_strncmp.c \
+			./function/main.c \
+			./function/parsing.c 
 
-PRINTFNAME = libftprintf.a
+OBJS	=	${SRCS:.c=.o}
 
-CFLAGS = -Wall -Wextra -Werror 
+CC		=	clang
 
+RM		=	rm -rf
 
-OBJ := $(.c=.o)
+CFLAGS	=	-Wall -Wextra -Werror #-g3 -fsanitize=thread
 
-SRC = ./main.c
+all: ${NAME}
+	@make -C ./ft_printf/ --no-print-directory
+	
 
-UTILS = ./function/* 
+${NAME}:	${OBJS}
+			mv ./ft_printf/libftprintf.a ./
+			$(CC) ${CFLAGS} $(OBJS) -I $(INCS) -o $(NAME) libftprintf.a
 
-all : $(NAME)
-
-%.o: %.c
-	$(CC) -o $@ -c $< $(CFLAGS)
-
-$(NAME): $(OBJ)
-		make -C $(PRINTFPATH)
-		mv $(PRINTFPATH)$(PRINTFNAME) $(PRINTFNAME)
-		${CC}  ${CFLAGS} $(UTILS) $(PRINTFNAME) -o ${NAME}
+.c.o:
+			${CC} ${CFLAGS} -c $< -o $@ -I ${INCS}
 
 clean:
-		rm -rf *.o && make -C $(PRINTFPATH) clean
+			${RM} ${OBJS}
 
-fclean: clean
-		rm -f $(PRINTFNAME) ${OBJS} $(NAME) && make -C $(PRINTFPATH) fclean
+fclean:		clean
+			${RM} ${NAME}
+			rm libftprintf.a
 
-re: fclean all
+re:			fclean all
+
+.PHONY:		all clean fclean re
