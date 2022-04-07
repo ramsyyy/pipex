@@ -6,7 +6,7 @@
 /*   By: raaga <raaga@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/24 13:51:20 by raaga             #+#    #+#             */
-/*   Updated: 2022/03/04 15:00:26 by raaga            ###   ########.fr       */
+/*   Updated: 2022/04/07 14:24:06 by raaga            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,10 @@ void	ft_son(char **argv, char **envp, t_pipex pipex)
 	pipex.cmd = get_path(pipex.cmd_arg[0], pipex.path);
 	if (pipex.cmd == NULL)
 	{
-		printf("%s %s\n", pipex.cmd_arg[0], ERR_CMD);
+		if (pipex.cmd_arg[0][0] != '/')
+		printf("bash: %s: %s\n", pipex.cmd_arg[0], ERR_CMD);
+		else
+			ft_printf("bash: %s: %s\n", pipex.cmd_arg[0], strerror(errno));
 		ft_free(pipex.cmd_arg);
 		exit (2);
 	}
@@ -69,7 +72,10 @@ void	ft_son2(char **argv, char **envp, t_pipex pipex)
 	pipex.cmd = get_path(pipex.cmd_arg[0], pipex.path);
 	if (pipex.cmd == NULL)
 	{
-		ft_printf("%s %s\n", pipex.cmd_arg[0], ERR_CMD);
+		if (pipex.cmd_arg[0][0] != '/')
+		printf("bash: %s: %s\n", pipex.cmd_arg[0], ERR_CMD);
+		else
+			ft_printf("bash: %s: %s\n", pipex.cmd_arg[0], strerror(errno));
 		ft_free(pipex.cmd_arg);
 		exit (2);
 	}
