@@ -6,7 +6,7 @@
 /*   By: raaga <raaga@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/24 18:57:29 by raaga             #+#    #+#             */
-/*   Updated: 2022/02/24 18:59:01 by raaga            ###   ########.fr       */
+/*   Updated: 2022/04/11 15:32:19 by raaga            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,20 +28,11 @@ int	check_arg(int argc, char **argv, char **envp, t_pipex *pipex)
 {
 	char	*s;
 
+	(void)argv;
 	if (argc != 5)
 		return (msg_err(ERR_ARG));
 	if (*envp == NULL)
 		return (0);
-	pipex->infile = open(argv[1], O_RDONLY);
-	if (pipex->infile < 0)
-	{
-		ft_printf("bash: %s: %s\n", argv[1], strerror(errno));
-	}
-	pipex->outfile = open(argv[4], O_TRUNC | O_CREAT | O_RDWR, 00644);
-	if (pipex->outfile < 0)
-	{
-		ft_printf("bash: %s: %s\n", argv[4], strerror(errno));
-	}
 	s = ft_strjoin(find_path(envp), ":");
 	pipex->path = complet_path(ft_split(s, ':'));
 	free(s);
